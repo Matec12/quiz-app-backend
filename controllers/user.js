@@ -7,13 +7,28 @@ const OperationalError = require("../utils/operationalError");
 
 exports.userCreate = catchAsync(async (req, res, next) => {
   // select only data needed to be saved to the database.
-  const fieldsArr = ["email", "username", "password", "confirmPassword"];
 
-  const allowFields = _.pick(req.body, fieldsArr);
+  const { email, username, password, confirmPassword } = req.body;
+
+  if (typeof username !== "string" || !helpers.usernameValidator(username)) {
+    return next(new OperationalError("Invalid username", 400));
+  }
+
+  if (typeof email !== "string" || !helpers.emailValidator(email)) {
+    return next(new OperationalError("Invalid email", 400));
+  }
+
+  if (typeof password !== "string" || !helpers.passwordValidator(password)) {
+    return next(new OperationalError("Invalid password", 400));
+  }
+
+  if (password !== confirmPassword) {
+    return next(new OperationalError("Passwords do not match", 400));
+  }
 
   // create new user
 
-  const user = new User(allowFields);
+  const user = new User(req.body);
 
   let message =
     "registration successful, kindly check your email for next step";
@@ -105,7 +120,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // Check if both email and password are provided
   if (!username || !password) {
     return next(
-      new OperationalError("Email and Password must be provided", 400, 1)
+      new OperationalError("Email and Password must be provided", 400)
     );
   }
 
@@ -116,9 +131,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // if password and email does not exist then throw error
   if (!user || !(await user.checkPassword(password, user.password))) {
-    return next(
-      new OperationalError("Invalid email address or password", 400, 1)
-    );
+    return next(new OperationalError("Invalid email address or password", 400));
   }
 
   helpers.generateTokenAndUserData(200, user, res, "login successful");

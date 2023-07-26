@@ -22,10 +22,6 @@ const handleJWTExpiredError = (err) => {
   return new OperationalError("Session expired, kindly re-login", 401);
 };
 
-const handleMulterError = (err) => {
-  return new OperationalError(err.message, 400);
-};
-
 const handleCastError = (err) => {
   const value = /".*?"/g.exec(err.message);
   const message = `${value} is a wrong input type for the field specified for`;

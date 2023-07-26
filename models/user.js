@@ -55,6 +55,10 @@ const userSchema = new Schema(
       required: [true, "password is required"],
       minLength: [8, "Password must contain at least 8 characters"],
       select: false,
+      validate: {
+        validator: helpers.passwordValidator,
+        message: "Password is invalid",
+      },
     },
     confirmPassword: {
       type: String,

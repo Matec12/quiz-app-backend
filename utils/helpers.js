@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const template = require('./emails/templates');
-const sendEmail = require('./emails/sendEmail');
+const jwt = require("jsonwebtoken");
+const template = require("./emails/templates");
+const sendEmail = require("./emails/sendEmail");
 
 class Helper {
   usernameValidator(value) {
@@ -22,22 +22,36 @@ class Helper {
     return true;
   }
 
+  passwordValidator(password) {
+    return (
+      password.length >= 8 &&
+      /[0-9]/.test(password) &&
+      /[a-z]/.test(password) &&
+      /[A-Z]/.test(password)
+    );
+  }
+
+  emailValidator(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  }
+
   generateTokenAndUserData(statusCode, user, res, message) {
     const userId = user._id;
 
     const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    res.cookie('token', token, { maxAge: 24 * 60 * 60 * 1000 }); //Expires After 24 hours
+    res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 }); //Expires After 24 hours
 
     res.status(statusCode).json({
-      status: 'success',
+      status: "success",
       message,
       data: {
         token,
-        user
-      }
+        user,
+      },
     });
   }
 

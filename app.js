@@ -2,7 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const cors = require("cors");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const userRoute = require("./routes/user");
 const OperationalError = require("./utils/operationalError");
@@ -34,7 +34,7 @@ app.use("/api/v1/user", userRoute);
 
 // handle all Unregister routes
 app.all("*", (req, _, next) => {
-  next(new OperationalError(`${req.originalUrl} is not a valid route`, 440));
+  next(new OperationalError(`${req.originalUrl} is not a valid route`, 404));
 });
 
 app.use(globalErrorHandler);
