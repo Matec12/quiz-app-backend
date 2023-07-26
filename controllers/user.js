@@ -4,6 +4,8 @@ const catchAsync = require("../utils/catchAsync");
 const User = require("../models/user");
 const helpers = require("../utils/helpers");
 const OperationalError = require("../utils/operationalError");
+const sendEmail = require("../utils/emails/sendEmail");
+const template = require("../utils/emails/templates");
 
 exports.userCreate = catchAsync(async (req, res, next) => {
   // select only data needed to be saved to the database.
@@ -137,4 +139,108 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   helpers.generateTokenAndUserData(200, user, res, "login successful");
+});
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // Fetch user with the provided email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new OperationalError("User not found", 400));
+  }
+
+  // set password reset Token
+  const oneTimeToken = user.generateOneTimeToken(
+    process.env.ONE_TIME_TOKEN_VALIDITY
+  ); //30 minutes validity
+
+  await user.save({ validateBeforeSave: false });
+
+  // Send token to the provided email
+  let resetURL = `${process.env.REDIRECT_URL}/reset_password/?token=${oneTimeToken}`;
+
+  const emailObj = {
+    user,
+    greeting: "Hello",
+    heading: `RESET YOUR PASSWORD.`,
+
+    message: `You have requested to reset your email, Kindly click of the reset button bellow to
+          reset. Kindly ignore if you did not request a password reset.`,
+
+    link: resetURL,
+    buttonText: "RESET",
+  };
+
+  const html = template.generateTemplate(emailObj);
+  let emailIsSent;
+
+  try {
+    if (process.env.NODE_ENV === "development") {
+      // Send to a mail trap
+      emailIsSent = await sendEmail({
+        email: user.email,
+        subject: "Password Reset Email (Expires After 30 minutes)",
+        html,
+      });
+    } else {
+      // send to actual mail
+      emailIsSent = await sendEmail({
+        email: user.email,
+        subject: "Password Reset Email (Expires After 30 minutes)",
+        html,
+      });
+    }
+
+    if (emailIsSent === "sent") {
+      res.status(200).json({
+        status: "success",
+        message: "Message sent to your email, kindly check",
+      });
+    }
+  } catch (err) {
+    user.oneTimeToken = undefined;
+    user.oneTimeTokenExpires = undefined;
+
+    // Save your data after modification
+    await user.save({ validateBeforeSave: false });
+    return next(
+      new OperationalError("Unable to send email, kindly try again", 500)
+    );
+  }
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const plainResetToken = req.params.oneTimeToken;
+  const hashedResetToken = crypto
+    .createHash("sha256")
+    .update(plainResetToken)
+    .digest("hex");
+
+  const message = "Password was reset successfully";
+
+  const user = await User.findOne({
+    oneTimeToken: hashedResetToken,
+    oneTimeTokenExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new OperationalError("invalid or expired token", 404));
+  }
+
+  const { password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return next(new OperationalError("Passwords do not match", 400));
+  }
+
+  user.password = password;
+  user.confirmPassword = confirmPassword;
+
+  user.oneTimeToken = undefined;
+  user.oneTimeTokenExpires = undefined;
+  await user.save();
+
+  res.status(200).json({
+    status: "success",
+    message,
+  });
 });
