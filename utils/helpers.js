@@ -50,7 +50,7 @@ class Helper {
     // Send token to the provided email
     let activateURL;
 
-    if (req.originalUrl.includes("/api/v1/users/")) {
+    if (req.originalUrl.includes("/api/v1/user/")) {
       activateURL = `${process.env.REDIRECT_URL}/verify_email/?token=${oneTimeToken}`;
     }
     console.log(oneTimeToken);

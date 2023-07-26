@@ -107,7 +107,7 @@ exports.generateTemplate = (emailObj) => {
                         <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                             <tr style="border-collapse:collapse"> 
-                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#ffffff;background-color:#000000d4">${emailObj.greeting} ${emailObj.user?.userName?.toUpperCase()}</h1></td> 
+                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#ffffff;background-color:#000000d4">${emailObj.greeting} ${emailObj.user?.username?.toUpperCase()}</h1></td> 
                             </tr> 
                         </table></td> 
                         </tr> 
