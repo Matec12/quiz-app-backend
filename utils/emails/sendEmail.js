@@ -22,7 +22,7 @@ const sendEmail = async (options) => {
       dynamicTemplateData: options.data,
       templateId: options.templateId,
     });
-    return "Sent";
+    return "sent";
   } catch (error) {
     console.log("email not sent");
     console.log(error);
