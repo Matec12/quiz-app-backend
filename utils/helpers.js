@@ -36,8 +36,10 @@ class Helper {
   }
 
   emailValidator(email) {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      return false;
+    }
+    return true;
   }
 
   generateTokenAndUserData(statusCode, user, res, message) {
@@ -82,10 +84,10 @@ class Helper {
 
     (subject = "ACTIVATE YOUR ACCOUNT (Expires After 30 minutes)"),
       (emailObj.heading = `KINDLY VERIFY YOUR EMAIL.`);
-    emailObj.message = `A warm welcome to PICKORDER, We are glad to have you here,
+    emailObj.message = `A warm welcome to QUIZAPP, We are glad to have you here,
             you have taken the first step, complete the next by verifying your 
             email address to complete your registration.
-            Kindly click on the verify button bellow to complete your registration.`;
+            Kindly click on the verify button below to complete your registration.`;
 
     emailObj.link = activateURL;
     emailObj.buttonText = "VERIFY";
@@ -96,14 +98,6 @@ class Helper {
 
     try {
       if (process.env.NODE_ENV === "development") {
-        // sentStatus = "sent";
-        // Send to a mail trap
-        // sentStatus = await sendEmail({
-        //     email : user.userEmail,
-        //     subject,
-        //     html
-        // });
-
         sentStatus = await sendEmail({
           email: user.email,
           subject,

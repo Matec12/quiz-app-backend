@@ -1,15 +1,13 @@
-
 exports.generateTemplate = (emailObj) => {
   const date = new Date();
-  const currentYear =  date.getFullYear();
+  const currentYear = date.getFullYear();
   const company = {
-    realName : "quizapp",
-    address : "Unilorin, Ilorin",
-    email : "dejalayo@gmail.com"
+    realName: "quizapp",
+    address: "Unilorin, Ilorin",
+    email: "dejalayo@gmail.com",
   };
 
-  const template = 
-    `
+  const template = `
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="width:100%;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
         <head> 
@@ -87,7 +85,7 @@ exports.generateTemplate = (emailObj) => {
                         <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                             <tr style="border-collapse:collapse"> 
-                            <td align="center" style="padding:0;Margin:0;font-size:0px"><a href="https://quizapp.vercel.app" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="https://i.ibb.co/FsyKKGf/Pick-Order-Logo-1-2x.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="100"></a></td> 
+                            <td align="center" style="padding:0;Margin:0;font-size:0px"><a href="https://quizapp.vercel.app" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="https://res.cloudinary.com/matec-technology-services/image/upload/v1690405483/quizapp/QuizApp_dz5orb.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="100"></a></td> 
                             </tr> 
                         </table></td> 
                         </tr> 
@@ -107,7 +105,9 @@ exports.generateTemplate = (emailObj) => {
                         <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                             <tr style="border-collapse:collapse"> 
-                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#ffffff;background-color:#000000d4">${emailObj.greeting} ${emailObj.user?.username?.toUpperCase()}</h1></td> 
+                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#ffffff;background-color:#000000d4">${
+                              emailObj.greeting
+                            } ${emailObj.user?.username?.toUpperCase()}</h1></td> 
                             </tr> 
                         </table></td> 
                         </tr> 
@@ -127,16 +127,24 @@ exports.generateTemplate = (emailObj) => {
                         <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                             <tr style="border-collapse:collapse"> 
-                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:5px;padding-bottom:15px"><h2 style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#333333">${emailObj.heading}</h2></td> 
+                            <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:5px;padding-bottom:15px"><h2 style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#333333">${
+                              emailObj.heading
+                            }</h2></td> 
                             </tr> 
                             <tr style="border-collapse:collapse"> 
-                            <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px">${emailObj.message}<br></p></td> 
+                            <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px">${
+                              emailObj.message
+                            }<br></p></td> 
                             </tr> 
                             <tr style="border-collapse:collapse"> 
                             <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px">Gracia!,</p></td> 
                             </tr> 
                             <tr style="border-collapse:collapse"> 
-                            <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:20px"><span class="es-button-border" style="border-style:solid;border-color:#26a4d3;background:none 0% 0% repeat scroll #26a4d3;border-width:0px;display:inline-block;border-radius:50px;width:auto"><a href="${emailObj.link}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;transition:all 100ms ease-in;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:13px;border-style:solid;border-color:#26a4d3;border-width:15px 30px 15px 30px;display:inline-block;background:#26a4d3;border-radius:50px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:17px;width:auto;text-align:center">${emailObj.buttonText} </a></span></td> 
+                            <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:20px"><span class="es-button-border" style="border-style:solid;border-color:#26a4d3;background:none 0% 0% repeat scroll #26a4d3;border-width:0px;display:inline-block;border-radius:50px;width:auto"><a href="${
+                              emailObj.link
+                            }" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;transition:all 100ms ease-in;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:13px;border-style:solid;border-color:#26a4d3;border-width:15px 30px 15px 30px;display:inline-block;background:#26a4d3;border-radius:50px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:17px;width:auto;text-align:center">${
+    emailObj.buttonText
+  } </a></span></td> 
                             </tr> 
                         </table></td> 
                         </tr> 
@@ -156,10 +164,14 @@ exports.generateTemplate = (emailObj) => {
                         <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                         <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                             <tr style="border-collapse:collapse"> 
-                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px"> ${company.address}</p></td> 
+                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px"> ${
+                              company.address
+                            }</p></td> 
                             </tr> 
                             <tr style="border-collapse:collapse"> 
-                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px">This email was sent to you from ${company.email}</p></td> 
+                            <td align="center" style="padding:0;Margin:0;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px">This email was sent to you from ${
+                              company.email
+                            }</p></td> 
                             </tr> 
                             <tr style="border-collapse:collapse"> 
                             <td align="center" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:13px">Copyright © ${currentYear} <strong> ${company.realName.toUpperCase()} </strong>, All Rights Reserved.</p></td> 
@@ -176,6 +188,6 @@ exports.generateTemplate = (emailObj) => {
         </div>  
         </body>
         </html>
-    `; 
+    `;
   return template;
 };
