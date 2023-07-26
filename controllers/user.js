@@ -120,7 +120,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // Check if both email and password are provided
   if (!username || !password) {
     return next(
-      new OperationalError("Email and Password must be provided", 400)
+      new OperationalError("Email/Username and Password must be provided", 400)
     );
   }
 
@@ -131,7 +131,9 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // if password and email does not exist then throw error
   if (!user || !(await user.checkPassword(password, user.password))) {
-    return next(new OperationalError("Invalid email address or password", 400));
+    return next(
+      new OperationalError("Invalid email/username or password", 400)
+    );
   }
 
   helpers.generateTokenAndUserData(200, user, res, "login successful");

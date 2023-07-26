@@ -19,6 +19,10 @@ class Helper {
       return false;
     }
 
+    if (value.length < 3 || value.length > 16) {
+      return false;
+    }
+
     return true;
   }
 
