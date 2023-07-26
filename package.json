@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "quiz application",
   "main": "app.js",
+  "documenation": "https://documenter.getpostman.com/view/18348177/2s946o5pnB",
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1",
     "start": "node server.js",

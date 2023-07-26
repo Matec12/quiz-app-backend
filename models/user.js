@@ -29,6 +29,27 @@ const userSchema = new Schema(
       trim: true,
       validate: [validator.isEmail, "Kindly provide a valid email address"],
     },
+    emailConfirmationStatus: {
+      type: Boolean,
+      default: false,
+    },
+    quizzesPlayed: {
+      type: Number,
+      default: 0,
+    },
+    successRate: {
+      type: Number,
+      default: 0,
+    },
+    stars: {
+      type: Number,
+      default: 0,
+    },
+    rapidFireCheckpoint: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Quiz", // Replace 'Quiz' with the name of the schema representing quizzes in your application.
+      default: null,
+    },
     password: {
       type: String,
       required: [true, "password is required"],
@@ -45,8 +66,8 @@ const userSchema = new Schema(
         message: "Confirm password must be the same as your password",
       },
     },
-    passwordChangedAt: Date,
 
+    passwordChangedAt: Date,
     // This token is use when user wish to verify email or forgot their password
     oneTimeToken: String,
     oneTimeTokenExpires: Date,

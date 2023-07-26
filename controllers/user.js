@@ -86,14 +86,5 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new OperationalError("Wrong Login Info", 400));
   }
 
-  // if (!user.accountStatus) {
-  //   return next(
-  //     new OperationalError(
-  //       "Your account has been deactivated, kindly contact support to re-activate",
-  //       400
-  //     )
-  //   );
-  // }
-
   helpers.generateTokenAndUserData(200, user, res, "login successful");
 });
