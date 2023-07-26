@@ -68,6 +68,37 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
   }
 });
 
+exports.resendVerificationEmail = catchAsync(async (req, res, next) => {
+  const email = req.body.email;
+
+  const user = await User.findOne({ email: email });
+
+  if (!user) {
+    return next(new OperationalError("Email address not found", 404));
+  }
+
+  if (user.emailConfirmationStatus) {
+    return next(new OperationalError("Your account is already activated", 406));
+  }
+
+  // Delete oneTimeToken  and oneTimeTokenExpires
+  (user.oneTimeToken = undefined), (user.oneTimeTokenExpires = undefined);
+  await user.save({ validateBeforeSave: false });
+
+  const emailStatus = await helpers.sendVerificationEmail(req, user);
+
+  if (emailStatus === "sent") {
+    res.status(200).json({
+      status: "success",
+      message: "Verification email sent successfully!",
+    });
+  } else {
+    return next(
+      new OperationalError("Something went wrong, kindly try again", 500)
+    );
+  }
+});
+
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
