@@ -46,7 +46,7 @@ const userSchema = new Schema(
       default: 0,
     },
     rapidFireCheckpoint: {
-      type: mongoose.Schema.ObjectId,
+      type: Schema.ObjectId,
       ref: "Quiz", // Replace 'Quiz' with the name of the schema representing quizzes in your application.
       default: null,
     },

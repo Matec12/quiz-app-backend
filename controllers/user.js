@@ -100,21 +100,25 @@ exports.resendVerificationEmail = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   // Check if both email and password are provided
-  if (!email || !password) {
+  if (!username || !password) {
     return next(
-      new OperationalError("Email and Password must be provided", 400)
+      new OperationalError("Email and Password must be provided", 400, 1)
     );
   }
 
   // If password and email is provided, fetch user and vet password
-  const user = await User.findOne({ email: email }).select("+password");
+  const user = await User.findOne({
+    $or: [{ email: username }, { username: username }],
+  }).select("+password");
 
   // if password and email does not exist then throw error
   if (!user || !(await user.checkPassword(password, user.password))) {
-    return next(new OperationalError("Wrong Login Info", 400));
+    return next(
+      new OperationalError("Invalid email address or password", 400, 1)
+    );
   }
 
   helpers.generateTokenAndUserData(200, user, res, "login successful");
