@@ -86,7 +86,11 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 });
 
 exports.resendVerificationEmail = catchAsync(async (req, res, next) => {
-  const email = req.body.email;
+  const { email } = req.body;
+
+  if (typeof email !== "string" || !helpers.emailValidator(email)) {
+    return next(new OperationalError("Invalid email", 400));
+  }
 
   const user = await User.findOne({ email: email });
 
@@ -143,7 +147,13 @@ exports.login = catchAsync(async (req, res, next) => {
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // Fetch user with the provided email
-  const user = await User.findOne({ email: req.body.email });
+  const { email } = req.body;
+
+  if (typeof email !== "string" || !helpers.emailValidator(email)) {
+    return next(new OperationalError("Invalid email", 400));
+  }
+
+  const user = await User.findOne({ email: email });
   if (!user) {
     return next(new OperationalError("User not found", 400));
   }
