@@ -125,7 +125,7 @@ class Helper {
     }
 
     if (validationErrors.length > 0) {
-      throw new OperationalError(validationErrors.join(". "), 400);
+      return next(new OperationalError(validationErrors.join(". "), 400));
     }
   };
 

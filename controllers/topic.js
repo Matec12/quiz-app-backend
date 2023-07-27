@@ -6,35 +6,38 @@ const OperationalError = require("../utils/operationalError");
 
 // Create a new topic
 exports.createTopic = catchAsync(async (req, res, next) => {
-  try {
-    helpers.validateTopicPayload(req.body, next, Question);
+  // try {
+  helpers.validateTopicPayload(req.body, next, Question);
 
-    const { title, category, level0, level1, level2, level3, level4 } =
-      req.body;
+  const { title, category, level0, level1, level2, level3, level4 } = req.body;
 
-    // Create the new topic
-    const topic = await Topic.create({
-      title,
-      category,
-      level0,
-      level1,
-      level2,
-      level3,
-      level4,
-    });
+  // Create the new topic
+  const topic = await Topic.create({
+    title,
+    category,
+    level0,
+    level1,
+    level2,
+    level3,
+    level4,
+  });
 
-    await topic.save();
+  await topic.save();
 
-    res
-      .status(200)
-      .json({ status: "success", message: "Topic created successfully" });
-  } catch (err) {
-    if (err instanceof OperationalError) {
-      return next(err);
-    }
-    console.error("Error creating topic:", err);
-    next(new OperationalError("Something went wrong", 500));
-  }
+  res
+    .status(200)
+    .json({ status: "success", message: "Topic created successfully" });
+
+  //     return next(
+  //       new OperationalError("Unable to send email, kindly try again", 500)
+  //     );
+  // } catch (err) {
+  //   if (err instanceof OperationalError) {
+  //     return next(err);
+  //   }
+  //   console.error("Error creating topic:", err);
+  //   next(new OperationalError("Something went wrong", 500));
+  // }
 });
 
 // Get all topics
