@@ -58,25 +58,23 @@ exports.createCategory = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.getCategory = async (req, res, next) => {
+exports.getCategory = catchAsync(async (req, res, next) => {
   try {
     const { categoryId } = req.query;
 
     if (!categoryId) {
       // If categoryId is not provided, get all categories
       const categories = await Category.find().populate("topics");
-      res
-        .status(200)
-        .json({
-          status: "success",
-          data: { result: categories?.length, categories: categories },
-        });
+      res.status(200).json({
+        status: "success",
+        data: { result: categories?.length, categories: categories },
+      });
     } else {
       // Find the category by its _id and populate the topics
       const category = await Category.findById(categoryId).populate("topics");
 
       if (!category) {
-        throw new OperationalError("Category not found", 404);
+        return next(new OperationalError("Category not found", 404));
       }
 
       res
@@ -90,9 +88,9 @@ exports.getCategory = async (req, res, next) => {
     console.error("Error getting category:", err);
     next(new OperationalError("Something went wrong", 500));
   }
-};
+});
 
-exports.updateCategory = async (req, res, next) => {
+exports.updateCategory = catchAsync(async (req, res, next) => {
   try {
     const { categoryId } = req.params;
 
@@ -142,9 +140,9 @@ exports.updateCategory = async (req, res, next) => {
     console.error("Error updating category:", err);
     return next(new OperationalError("Something went wrong", 500));
   }
-};
+});
 
-exports.deleteCategory = async (req, res, next) => {
+exports.deleteCategory = catchAsync(async (req, res, next) => {
   try {
     const { categoryId } = req.params;
 
@@ -156,10 +154,10 @@ exports.deleteCategory = async (req, res, next) => {
     }
 
     res
-      .status(204)
+      .status(200)
       .json({ status: "success", message: "category deleted successfully" });
   } catch (err) {
     console.error("Error deleting category:", err);
     return next(new OperationalError("Something went wrong", 500));
   }
-};
+});

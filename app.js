@@ -7,6 +7,8 @@ const mongoSanitize = require("express-mongo-sanitize");
 const userRoute = require("./routes/user");
 const adminRoute = require("./routes/admin");
 const categoryRoute = require("./routes/category");
+const topicRoute = require("./routes/topic");
+const questionRoute = require("./routes/question");
 const OperationalError = require("./utils/operationalError");
 const globalErrorHandler = require("./middlewares/errorHandler/globalErrorHandler");
 
@@ -35,6 +37,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/category", categoryRoute);
+app.use("/api/v1/topic", topicRoute);
+app.use("/api/v1/question", questionRoute);
 
 // handle all Unregister routes
 app.all("*", (req, _, next) => {

@@ -46,6 +46,15 @@ const topicSchema = new Schema(
   { timestamps: true }
 );
 
+topicSchema.methods.toJSON = function () {
+  const topic = this;
+  const topicObject = topic.toObject();
+
+  delete topicObject.__v;
+
+  return topicObject;
+};
+
 const Topic = mongoose.model("Topic", topicSchema);
 
 module.exports = Topic;

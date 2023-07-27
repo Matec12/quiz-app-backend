@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const template = require("./emails/templates");
+const mongoose = require("mongoose");
 const sendEmail = require("./emails/sendEmail");
+const OperationalError = require("../utils/operationalError");
 
 class Helper {
   usernameValidator(value) {
@@ -83,6 +85,80 @@ class Helper {
       user.oneTimeToken = undefined;
     }
   }
+
+  validateTopicPayload = async (payload, next, Question) => {
+    const { title, category, level0, level1, level2, level3, level4 } = payload;
+    const levelArrays = [level0, level1, level2, level3, level4];
+
+    const validationErrors = [];
+
+    if (!title) {
+      validationErrors.push("Topic title is required");
+    }
+
+    if (!category) {
+      validationErrors.push("Category is required");
+    }
+
+    // Check if all levels contain valid question IDs
+    for (let i = 0; i < levelArrays.length; i++) {
+      const questions = levelArrays[i];
+      if (!Array.isArray(questions)) {
+        validationErrors.push(`Level ${i} questions must be an array`);
+      } else {
+        for (const questionId of questions) {
+          const question = await Question.findById(questionId);
+          if (!question) {
+            validationErrors.push(`Question not found with ID: ${questionId}`);
+          } else if (question.level !== i) {
+            validationErrors.push(
+              `Question level (${question.level}) does not match the topic level (${i}) for question with ID: ${questionId}`
+            );
+          }
+        }
+      }
+
+      // Validate level value
+      if (i !== 0 && (i < 0 || i > 4)) {
+        validationErrors.push(`Invalid level value: ${i}`);
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      throw new OperationalError(validationErrors.join(". "), 400);
+    }
+  };
+
+  validateQuestionPayload = (payload, next) => {
+    const { prompt, options, level, correctAnswer } = payload;
+    const optionCount = Array.isArray(options) ? options.length : 0;
+
+    const validationErrors = [];
+
+    if (!prompt) {
+      validationErrors.push("Prompt is required");
+    }
+
+    if (!options || optionCount !== 4) {
+      validationErrors.push("Options must be an array of exactly 4 elements");
+    }
+
+    if (typeof level !== "number" || level < 0 || level > 4) {
+      validationErrors.push("Level must be a number between 0 and 4");
+    }
+
+    if (
+      typeof correctAnswer !== "number" ||
+      correctAnswer < 0 ||
+      correctAnswer > 3
+    ) {
+      validationErrors.push("Correct answer must be a number between 0 and 3");
+    }
+
+    if (validationErrors.length > 0) {
+      return next(new OperationalError(validationErrors.join(". "), 400));
+    }
+  };
 
   async sendVerificationEmail(req, user) {
     const oneTimeToken = user.generateOneTimeToken(
