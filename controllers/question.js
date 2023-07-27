@@ -174,7 +174,7 @@ exports.getRapidFireQuestions = catchAsync(async (req, res, next) => {
 
     const today = new Date().setHours(0, 0, 0, 0);
     const checkpointDate = user.rapidFireCheckpoint
-      ? user.rapidFireCheckpoint.getMilliseconds()
+      ? Date.parse(user.rapidFireCheckpoint)
       : 0;
 
     // If rapidFireCheckpoint is not set or is not the current day, get new questions
