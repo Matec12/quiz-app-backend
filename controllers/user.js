@@ -274,3 +274,33 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     message,
   });
 });
+
+exports.getUserStats = catchAsync(async (req, res, next) => {
+  try {
+    const { _id: userId } = req.user;
+    console.log(req.user);
+
+    // Find the user by their _id
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(new OperationalError("User not found", 404));
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        quizzesPlayed: user.quizzesPlayed,
+        successRate: user.successRate,
+        stars: user.stars,
+        rapidFireCheckpoint: user.rapidFireCheckpoint,
+      },
+    });
+  } catch (err) {
+    if (err instanceof OperationalError) {
+      return next(err);
+    }
+    console.error("Error getting user statistics:", err);
+    next(new OperationalError("Something went wrong", 500));
+  }
+});
