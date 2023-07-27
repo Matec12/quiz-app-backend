@@ -1,4 +1,5 @@
 const Topic = require("../models/topic");
+const Category = require("../models/category");
 const Question = require("../models/question");
 const catchAsync = require("../utils/catchAsync");
 const helpers = require("../utils/helpers");
@@ -6,9 +7,10 @@ const OperationalError = require("../utils/operationalError");
 
 // Create a new topic
 exports.createTopic = catchAsync(async (req, res, next) => {
-  helpers.validateTopicPayload(req.body, next, Question);
+  helpers.validateTopicPayload(req.body, next, Category, Question);
 
   const { title, category, level0, level1, level2, level3, level4 } = req.body;
+  console.log(req.body);
 
   // Create the new topic
   const topic = await Topic.create({
@@ -20,6 +22,8 @@ exports.createTopic = catchAsync(async (req, res, next) => {
     level3,
     level4,
   });
+
+  console.log({ topic });
 
   await topic.save();
 
@@ -76,7 +80,7 @@ exports.updateTopic = catchAsync(async (req, res, next) => {
     return next(new OperationalError("Topic not found", 404));
   }
 
-  helpers.validateTopicPayload(req.body, next, Question);
+  helpers.validateTopicPayload(req.body, next, Category, Question);
 
   const { title, category, level0, level1, level2, level3, level4 } = req.body;
 

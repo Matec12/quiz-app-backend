@@ -86,7 +86,7 @@ class Helper {
     }
   }
 
-  validateTopicPayload = async (payload, next, Question) => {
+  validateTopicPayload = async (payload, next, Category, Question) => {
     const { title, category, level0, level1, level2, level3, level4 } = payload;
     const levelArrays = [level0, level1, level2, level3, level4];
 
@@ -98,6 +98,12 @@ class Helper {
 
     if (!category) {
       validationErrors.push("Category is required");
+    } else {
+      // Check if the category exists in the database
+      const existingCategory = await Category.findById(category);
+      if (!existingCategory) {
+        validationErrors.push("Category not found in the database");
+      }
     }
 
     // Check if all levels contain valid question IDs
