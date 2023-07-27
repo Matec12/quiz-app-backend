@@ -5,28 +5,27 @@ const OperationalError = require("../utils/operationalError");
 
 // Create a new question
 exports.createQuestion = catchAsync(async (req, res, next) => {
-  try {
-    helpers.validateQuestionPayload(req.body, next);
+  helpers.validateQuestionPayload(req.body, next);
 
-    const { prompt, options, level, correctAnswer } = req.body;
+  const { prompt, options, level, correctAnswer } = req.body;
 
-    // Create the new question
-    const question = await Question.create({
-      prompt,
-      options,
-      level,
-      correctAnswer,
-    });
+  // Create the new question
+  const question = await Question.create({
+    prompt,
+    options,
+    level,
+    correctAnswer,
+  });
 
-    await question.save();
+  await question.save();
 
-    res
-      .status(200)
-      .json({ status: "success", message: "Question created successfully" });
-  } catch (err) {
-    console.error("Error creating question:", err);
-    next(new OperationalError("Something went wrong", 500));
+  if (!question) {
+    return next(new OperationalError("something went wrong", 500));
   }
+
+  res
+    .status(200)
+    .json({ status: "success", message: "Question created successfully" });
 });
 
 // Get all questions
@@ -53,7 +52,7 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
       }
 
       const questions = await Question.find(query);
-      
+
       res.status(200).json({
         status: "success",
         data: { result: questions?.length, questions: questions },
@@ -70,41 +69,36 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
 
 // Update a question by its _id
 exports.updateQuestion = catchAsync(async (req, res, next) => {
-  try {
-    const { questionId } = req.params;
+  const { questionId } = req.params;
 
-    // Find the question by its _id
-    const question = await Question.findById(questionId);
+  // Find the question by its _id
+  const question = await Question.findById(questionId);
 
-    if (!question) {
-      return next(new OperationalError("Question not found", 404));
-    }
-
-    // Validate the request body
-    helpers.validateQuestionPayload(req.body, next);
-
-    const { prompt, options, level, correctAnswer } = req.body;
-
-    // Update the question fields
-    question.prompt = prompt;
-    question.options = options;
-    question.level = level;
-    question.correctAnswer = correctAnswer;
-
-    // Save the updated question to the database
-    await question.save();
-
-    res
-      .status(200)
-      .json({ status: "success", message: "Question updated successfully" });
-  } catch (err) {
-    if (err instanceof OperationalError) {
-      return next(err);
-    }
-
-    console.error("Error updating question:", err);
-    return next(new OperationalError("Something went wrong", 500));
+  if (!question) {
+    return next(new OperationalError("Question not found", 404));
   }
+
+  // Validate the request body
+  helpers.validateQuestionPayload(req.body, next);
+
+  const { prompt, options, level, correctAnswer } = req.body;
+
+  // Update the question fields
+  question.prompt = prompt;
+  question.options = options;
+  question.level = level;
+  question.correctAnswer = correctAnswer;
+
+  // Save the updated question to the database
+  await question.save();
+
+  if (!question) {
+    return next(new OperationalError("something went wrong", 500));
+  }
+
+  res
+    .status(200)
+    .json({ status: "success", message: "Question updated successfully" });
 });
 
 // Delete a question by its _id

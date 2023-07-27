@@ -6,7 +6,6 @@ const OperationalError = require("../utils/operationalError");
 
 // Create a new topic
 exports.createTopic = catchAsync(async (req, res, next) => {
-  // try {
   helpers.validateTopicPayload(req.body, next, Question);
 
   const { title, category, level0, level1, level2, level3, level4 } = req.body;
@@ -24,20 +23,13 @@ exports.createTopic = catchAsync(async (req, res, next) => {
 
   await topic.save();
 
+  if (!topic) {
+    return next(new OperationalError("something went wrong", 500));
+  }
+
   res
     .status(200)
     .json({ status: "success", message: "Topic created successfully" });
-
-  //     return next(
-  //       new OperationalError("Unable to send email, kindly try again", 500)
-  //     );
-  // } catch (err) {
-  //   if (err instanceof OperationalError) {
-  //     return next(err);
-  //   }
-  //   console.error("Error creating topic:", err);
-  //   next(new OperationalError("Something went wrong", 500));
-  // }
 });
 
 // Get all topics
@@ -76,40 +68,35 @@ exports.getTopic = catchAsync(async (req, res, next) => {
 
 // Update a topic by its _id
 exports.updateTopic = catchAsync(async (req, res, next) => {
-  try {
-    const { topicId } = req.params;
+  const { topicId } = req.params;
 
-    const existingTopic = await Topic.findById(topicId);
+  const existingTopic = await Topic.findById(topicId);
 
-    if (!existingTopic) {
-      return next(new OperationalError("Topic not found", 404));
-    }
-
-    helpers.validateTopicPayload(req.body, next, Question);
-
-    const { title, category, level0, level1, level2, level3, level4 } =
-      req.body;
-
-    existingTopic.title = title;
-    existingTopic.category = category;
-    existingTopic.level0 = level0;
-    existingTopic.level1 = level1;
-    existingTopic.level2 = level2;
-    existingTopic.level3 = level3;
-    existingTopic.level4 = level4;
-
-    await existingTopic.save();
-
-    res
-      .status(200)
-      .json({ status: "success", message: "Topic updated successfully" });
-  } catch (err) {
-    if (err instanceof OperationalError) {
-      return next(err);
-    }
-    console.error("Error updating topic:", err);
-    next(new OperationalError("Something went wrong", 500));
+  if (!existingTopic) {
+    return next(new OperationalError("Topic not found", 404));
   }
+
+  helpers.validateTopicPayload(req.body, next, Question);
+
+  const { title, category, level0, level1, level2, level3, level4 } = req.body;
+
+  existingTopic.title = title;
+  existingTopic.category = category;
+  existingTopic.level0 = level0;
+  existingTopic.level1 = level1;
+  existingTopic.level2 = level2;
+  existingTopic.level3 = level3;
+  existingTopic.level4 = level4;
+
+  await existingTopic.save();
+
+  if (!existingTopic) {
+    return next(new OperationalError("something went wrong", 500));
+  }
+
+  res
+    .status(200)
+    .json({ status: "success", message: "Topic updated successfully" });
 });
 
 // Delete a topic by its _id
