@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
+const Joi = require('joi');
 const template = require("./emails/templates");
-const mongoose = require("mongoose");
 const sendEmail = require("./emails/sendEmail");
 const OperationalError = require("../utils/operationalError");
 
@@ -165,6 +165,11 @@ class Helper {
       return next(new OperationalError(validationErrors.join(". "), 400));
     }
   };
+
+  validQuizAnsweredPayload = Joi.object({
+    quizResult: Joi.number().integer().min(0).required(),
+    starsEarned: Joi.number().integer().min(0).required(),
+  });
 
   async sendVerificationEmail(req, user) {
     const oneTimeToken = user.generateOneTimeToken(

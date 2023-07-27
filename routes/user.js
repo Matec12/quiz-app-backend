@@ -14,5 +14,6 @@ router.post("/forgot_password", user.forgotPassword);
 router.post("/reset_password/:oneTimeToken", user.resetPassword);
 
 router.get("/stats", secureRoute, user.getUserStats);
+router.put("/stats/update", secureRoute, user.updateStats);
 
 module.exports = router;

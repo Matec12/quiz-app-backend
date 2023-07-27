@@ -214,28 +214,40 @@ exports.getRapidFireQuestions = catchAsync(async (req, res, next) => {
 
 exports.rapidFireCompleted = catchAsync(async (req, res, next) => {
   try {
-    const userId = req.user._id;
-    const { quizResult, stars } = req.body;
+    const { error } = helpers.validQuizAnsweredPayload.validate(req.body);
+    if (error) {
+      return next(new OperationalError(error.details[0].message, 400));
+    }
+    const { quizResult, starsEarned } = req.body;
+    const userId = req.user.id; // Assuming you have middleware to get the logged-in user ID
 
-    // Update the user's quizResult and stars
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { quizResult, stars },
-      { new: true } // Return the updated user after the update
-    );
-
+    // Update the user's successRate and quizzesPlayed based on the new quizResult
+    const user = await User.findById(userId);
     if (!user) {
       return next(new OperationalError("User not found", 404));
     }
 
-    // Set the rapidFireCheckpoint to the current day
+    // Calculate the new successRate
+    const totalQuizzesPlayed = user.quizzesPlayed + 1;
+    const totalCorrectAnswers =
+      user.quizzesPlayed * user.successRate + quizResult;
+    const newSuccessRate = totalCorrectAnswers / totalQuizzesPlayed;
+    const totalStarsEarned = user.stars + starsEarned;
+
+    // Update the user's successRate and quizzesPlayed
+    user.successRate = newSuccessRate;
+    user.quizzesPlayed = totalQuizzesPlayed;
+    user.stars = totalStarsEarned;
+
+    // Update the rapidFireCheckpoint to the current day
     user.rapidFireCheckpoint = new Date();
+
+    // Save the updated user data to the database
     await user.save();
 
-    // Return a success response
     res.status(200).json({
       status: "success",
-      message: "Rapid fire completed successfully.",
+      message: "Rapid fire completed successfully",
     });
   } catch (err) {
     console.error("Error updating rapid fire completion:", err);

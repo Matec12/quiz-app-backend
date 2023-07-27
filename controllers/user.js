@@ -304,3 +304,45 @@ exports.getUserStats = catchAsync(async (req, res, next) => {
     next(new OperationalError("Something went wrong", 500));
   }
 });
+
+exports.updateStats = catchAsync(async (req, res, next) => {
+  try {
+    const { error } = helpers.validQuizAnsweredPayload.validate(req.body);
+    if (error) {
+      return next(new OperationalError(error.details[0].message, 400));
+    }
+
+    const { quizResult, starsEarned } = req.body;
+
+    const userId = req.user.id;
+
+    // Update the user's successRate and quizzesPlayed based on the new quizResult
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new OperationalError("User not found", 404));
+    }
+
+    // Calculate the new successRate
+    const totalQuizzesPlayed = user.quizzesPlayed + 1;
+    const totalCorrectAnswers =
+      user.quizzesPlayed * user.successRate + quizResult;
+    const newSuccessRate = totalCorrectAnswers / totalQuizzesPlayed;
+    const totalStarsEarned = user.stars + starsEarned;
+
+    // Update the user's successRate and quizzesPlayed
+    user.successRate = newSuccessRate;
+    user.quizzesPlayed = totalQuizzesPlayed;
+    user.stars = totalStarsEarned;
+
+    // Save the updated user data to the database
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "User stats updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating rapid fire completion:", err);
+    next(new OperationalError("Something went wrong", 500));
+  }
+});
