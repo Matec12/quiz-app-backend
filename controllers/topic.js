@@ -7,10 +7,9 @@ const OperationalError = require("../utils/operationalError");
 
 // Create a new topic
 exports.createTopic = catchAsync(async (req, res, next) => {
-  helpers.validateTopicPayload(req.body, next, Category, Question);
-
   const { title, category, level0, level1, level2, level3, level4 } = req.body;
-  console.log(req.body);
+
+  await helpers.validateTopicPayload(req.body, Category, Question);
 
   // Create the new topic
   const topic = await Topic.create({
@@ -22,8 +21,6 @@ exports.createTopic = catchAsync(async (req, res, next) => {
     level3,
     level4,
   });
-
-  console.log({ topic });
 
   await topic.save();
 
@@ -80,7 +77,7 @@ exports.updateTopic = catchAsync(async (req, res, next) => {
     return next(new OperationalError("Topic not found", 404));
   }
 
-  helpers.validateTopicPayload(req.body, next, Category, Question);
+  helpers.validateTopicPayload(req.body, Category, Question);
 
   const { title, category, level0, level1, level2, level3, level4 } = req.body;
 

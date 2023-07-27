@@ -86,7 +86,7 @@ class Helper {
     }
   }
 
-  validateTopicPayload = async (payload, next, Category, Question) => {
+  validateTopicPayload = async (payload, Category, Question) => {
     const { title, category, level0, level1, level2, level3, level4 } = payload;
     const levelArrays = [level0, level1, level2, level3, level4];
 
@@ -131,7 +131,7 @@ class Helper {
     }
 
     if (validationErrors.length > 0) {
-      return next(new OperationalError(validationErrors.join(". "), 400));
+      throw new OperationalError(validationErrors.join(". "), 400);
     }
   };
 
