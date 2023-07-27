@@ -67,6 +67,42 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
   }
 });
 
+// Controller to get 20 random questions by level
+exports.getRandomQuestionsByLevel = catchAsync(async (req, res, next) => {
+  try {
+    const { level } = req.params;
+
+    // Validate that the level is a valid number
+    if (isNaN(level)) {
+      return next(new OperationalError("Invalid level format", 400));
+    }
+
+    // Convert the level to a number
+    const parsedLevel = parseInt(level, 10);
+
+    // Query the database to retrieve 20 random questions with the specified level
+    const questions = await Question.aggregate([
+      { $match: { level: parsedLevel } },
+      { $sample: { size: 20 } },
+    ]);
+
+    if (!questions || questions.length === 0) {
+      return next(
+        new OperationalError("No questions found for the specified level", 404)
+      );
+    }
+
+    // Return the list of random questions
+    res.status(200).json({
+      status: "success",
+      data: { result: questions.length, questions: questions },
+    });
+  } catch (err) {
+    console.error("Error fetching random questions:", err);
+    next(new OperationalError("Something went wrong", 500));
+  }
+});
+
 // Update a question by its _id
 exports.updateQuestion = catchAsync(async (req, res, next) => {
   const { questionId } = req.params;

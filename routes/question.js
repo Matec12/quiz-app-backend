@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post("/create", secureRoute, restrict("user"), question.createQuestion);
 router.get("/get", secureRoute, question.getQuestion);
+router.get("/random/:level", secureRoute, question.getRandomQuestionsByLevel);
 router.put(
   "/update/:questionId",
   secureRoute,
