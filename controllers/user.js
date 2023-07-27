@@ -32,8 +32,11 @@ exports.userCreate = catchAsync(async (req, res, next) => {
 
   const user = new User(req.body);
 
-  let message =
-    "registration successful, kindly check your email for next step";
+  let message = req.originalUrl.includes("admin")
+    ? "admin created successfully"
+    : "registration successful, kindly check your email for next step";
+
+  helpers.assignRole(req, user, "admin");
 
   const emailStatus = await helpers.sendVerificationEmail(req, user);
   await user.save();
@@ -142,6 +145,12 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
 
+  if (req.originalUrl.includes("admin/login") && user.role === "user") {
+    return next(
+      new OperationalError("sorry, you can not login with this route", 403)
+    );
+  }
+
   helpers.generateTokenAndUserData(200, user, res, "login successful");
 });
 
@@ -238,8 +247,19 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   const { password, confirmPassword } = req.body;
 
+  if (typeof password !== "string" || !helpers.passwordValidator(password)) {
+    return next(
+      new OperationalError("Invalid password / Password not provided", 400)
+    );
+  }
+
   if (password !== confirmPassword) {
-    return next(new OperationalError("Passwords do not match", 400));
+    return next(
+      new OperationalError(
+        "Passwords do not match / Confirm Password not provided",
+        400
+      )
+    );
   }
 
   user.password = password;

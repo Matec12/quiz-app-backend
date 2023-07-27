@@ -33,6 +33,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    role: {
+      type: String,
+      default: "user",
+    },
     quizzesPlayed: {
       type: Number,
       default: 0,

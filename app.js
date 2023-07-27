@@ -5,6 +5,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const userRoute = require("./routes/user");
+const adminRoute = require("./routes/admin");
+const categoryRoute = require("./routes/category");
 const OperationalError = require("./utils/operationalError");
 const globalErrorHandler = require("./middlewares/errorHandler/globalErrorHandler");
 
@@ -31,6 +33,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Register all routes
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/admin", adminRoute);
+app.use("/api/v1/category", categoryRoute);
 
 // handle all Unregister routes
 app.all("*", (req, _, next) => {

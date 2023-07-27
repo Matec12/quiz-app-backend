@@ -61,6 +61,29 @@ class Helper {
     });
   }
 
+  async logActivity(obj) {
+    const activity = await Activity.create({
+      user: obj.user,
+      action: obj.action,
+      actionOn: obj.actionOn,
+      onModel: obj.onModel,
+      merchant: obj.merchantId,
+    });
+
+    if (!activity) {
+      console.log("can't create activity");
+    }
+  }
+
+  assignRole(req, user, role) {
+    if (req.originalUrl.includes("admin")) {
+      user.role = role;
+      user.emailConfirmationStatus = true;
+      user.oneTimeTokenExpires = undefined;
+      user.oneTimeToken = undefined;
+    }
+  }
+
   async sendVerificationEmail(req, user) {
     const oneTimeToken = user.generateOneTimeToken(
       process.env.ONE_TIME_TOKEN_VALIDITY
