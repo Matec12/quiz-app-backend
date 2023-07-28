@@ -294,6 +294,7 @@ exports.getCurrentUser = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
+      message: "User stats fetched successfully",
       data: {
         user: user,
       },
@@ -321,11 +322,14 @@ exports.getUserStats = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
+      message: "User stats fetched successfully",
       data: {
-        quizzesPlayed: user.quizzesPlayed,
-        successRate: user.successRate,
-        stars: user.stars,
-        rapidFireCheckpoint: user.rapidFireCheckpoint,
+        stat: {
+          quizzesPlayed: user.quizzesPlayed,
+          successRate: user.successRate,
+          stars: user.stars,
+          rapidFireCheckpoint: user.rapidFireCheckpoint,
+        },
       },
     });
   } catch (err) {
