@@ -275,6 +275,33 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getCurrentUser = catchAsync(async (req, res, next) => {
+  try {
+    const { _id: userId } = req.user;
+    console.log(req.user);
+
+    // Find the user by their _id
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(new OperationalError("User not found", 404));
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        user: user,
+      },
+    });
+  } catch (err) {
+    if (err instanceof OperationalError) {
+      return next(err);
+    }
+    console.error("Error getting user", err);
+    next(new OperationalError("Something went wrong", 500));
+  }
+});
+
 exports.getUserStats = catchAsync(async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
