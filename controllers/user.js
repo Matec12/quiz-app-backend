@@ -284,7 +284,12 @@ exports.getCurrentUser = catchAsync(async (req, res, next) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return next(new OperationalError("User not found", 404));
+      return next(
+        new OperationalError(
+          "User not found, please create account to continue",
+          404
+        )
+      );
     }
 
     res.status(200).json({
