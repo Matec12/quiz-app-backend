@@ -28,7 +28,12 @@ exports.secureRoute = catchAsync(async (req, res, next) => {
   const validUser = await User.findById(data.userId);
 
   if (!validUser) {
-    return next(new OperationalError("User not found", 404));
+    return next(
+      new OperationalError(
+        "User not found, kindly create an account to continue",
+        401
+      )
+    );
   }
 
   // If user change password after token has being issue then throw error

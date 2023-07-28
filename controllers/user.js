@@ -286,7 +286,7 @@ exports.getCurrentUser = catchAsync(async (req, res, next) => {
     if (!user) {
       return next(
         new OperationalError(
-          "User not found, please create account to continue",
+          "User not found, kindly create an account to continue",
           404
         )
       );
