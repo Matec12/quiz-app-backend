@@ -7,6 +7,11 @@ const router = express.Router();
 
 router.post("/create", secureRoute, restrict("user"), category.createCategory);
 router.get("/get", secureRoute, category.getCategory);
+router.get(
+  "/get/:categoryId/:level",
+  secureRoute,
+  category.getCategoryByIdAndLevel
+);
 router.put(
   "/update/:categoryId",
   secureRoute,

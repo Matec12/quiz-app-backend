@@ -175,7 +175,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Send token to the provided email
-  let resetURL = `${process.env.REDIRECT_URL}/reset_password/?token=${oneTimeToken}`;
+  let resetURL = `${process.env.REDIRECT_URL}/reset_password?token=${oneTimeToken}`;
 
   const emailObj = {
     user,
@@ -278,7 +278,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 exports.getCurrentUser = catchAsync(async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
-    console.log(req.user);
 
     // Find the user by their _id
     const user = await User.findById(userId);
@@ -311,7 +310,6 @@ exports.getCurrentUser = catchAsync(async (req, res, next) => {
 exports.getUserStats = catchAsync(async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
-    console.log(req.user);
 
     // Find the user by their _id
     const user = await User.findById(userId);

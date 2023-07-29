@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const Joi = require('joi');
+const Joi = require("joi");
 const template = require("./emails/templates");
 const sendEmail = require("./emails/sendEmail");
 const OperationalError = require("../utils/operationalError");
@@ -171,6 +171,27 @@ class Helper {
     starsEarned: Joi.number().integer().min(0).required(),
   });
 
+  selectRandom(array, number) {
+    /**@type {number[]} */
+    const indexes = [];
+    const selected = [];
+
+    while (selected.length < number) {
+      const select = parseFloat((Math.random() * 100).toFixed()) % array.length;
+
+      if (indexes.includes(select)) {
+        continue;
+      }
+      indexes.push(select);
+      selected.push(array[select]);
+    }
+    return selected;
+  }
+
+  shuffle(array) {
+    return this.selectRandom(array, array.length);
+  }
+
   async sendVerificationEmail(req, user) {
     const oneTimeToken = user.generateOneTimeToken(
       process.env.ONE_TIME_TOKEN_VALIDITY
@@ -181,7 +202,7 @@ class Helper {
     let activateURL;
 
     if (req.originalUrl.includes("/api/v1/user/")) {
-      activateURL = `${process.env.REDIRECT_URL}/verify_email/?token=${oneTimeToken}`;
+      activateURL = `${process.env.REDIRECT_URL}/verify_email?token=${oneTimeToken}`;
     }
     console.log(oneTimeToken);
 

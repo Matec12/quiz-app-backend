@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
-const categoryNames = require("../constants/categoryNames");
+const { categoryNames, categoryIds } = require("../constants/category");
 
 const Schema = mongoose.Schema;
 
@@ -14,6 +14,11 @@ const categorySchema = new Schema(
     slug: {
       type: String,
       unique: true,
+    },
+    categoryId: {
+      type: Number,
+      unique: true,
+      enum: categoryIds,
     },
     topics: [
       {

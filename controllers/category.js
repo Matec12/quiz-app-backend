@@ -1,8 +1,10 @@
 const slugify = require("slugify");
-const catchAsync = require("../utils/catchAsync");
 const Category = require("../models/category");
 const Topic = require("../models/topic");
-const categoryNames = require("../constants/categoryNames");
+const Question = require("../models/question");
+const catchAsync = require("../utils/catchAsync");
+const helpers = require("../utils/helpers");
+const { categoryNames } = require("../constants/category");
 const OperationalError = require("../utils/operationalError");
 
 exports.createCategory = catchAsync(async (req, res, next) => {
@@ -21,6 +23,9 @@ exports.createCategory = catchAsync(async (req, res, next) => {
 
   // Generate the categoryId (slug) from the category name
   const slug = slugify(name, { lower: true });
+
+  // Generate categoryId (nums) from category name
+  const categoryId = categoryNames.indexOf(name) + 1;
 
   // Check if a category with the same slug already exists
   const existingCategory = await Category.findOne({ slug });
@@ -43,7 +48,7 @@ exports.createCategory = catchAsync(async (req, res, next) => {
   }
 
   // Create the new category
-  const category = new Category({ name, slug, topics: topics });
+  const category = new Category({ name, slug, categoryId, topics: topics });
 
   category.save();
 
@@ -89,6 +94,65 @@ exports.getCategory = catchAsync(async (req, res, next) => {
   }
 });
 
+exports.getCategoryByIdAndLevel = catchAsync(async (req, res, next) => {
+  try {
+    // if not categoryId or level, return error
+    const { categoryId, level } = req.params;
+
+    if (!categoryId || !level) {
+      return next(
+        new OperationalError("categoryId / level is required in path"),
+        400
+      );
+    }
+
+    if (isNaN(level)) {
+      return next(new OperationalError("Invalid level format", 400));
+    }
+
+    // Convert the level to a number
+    const parsedLevel = parseInt(level, 10);
+
+    const category = await Category.findOne({ categoryId }).populate({
+      path: "topics",
+      populate: {
+        path: `level${parsedLevel}`,
+      },
+    });
+
+    if (!category) {
+      return next(new OperationalError("Category not found", 404));
+    }
+
+    const topics = category.topics;
+
+    let questions = [];
+    for (const topic of topics) {
+      const topicLevel = topic[`level${parsedLevel}`];
+      for (const lev of topicLevel) {
+        questions.push(lev);
+      }
+    }
+
+    const randomQuestions = helpers.shuffle(questions);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Question fetched succefully",
+      data: {
+        quiz: {
+          category: category.name,
+          level: parsedLevel,
+          questions: randomQuestions,
+        },
+      },
+    });
+  } catch (err) {
+    console.error("Error deleting category:", err);
+    return next(new OperationalError("Something went wrong", 500));
+  }
+});
+
 exports.updateCategory = catchAsync(async (req, res, next) => {
   const { categoryId } = req.params;
 
@@ -105,7 +169,7 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   }
 
   // Find the existing category by its categoryId
-  const existingCategory = await Category.findOne({ _id: categoryId });
+  const existingCategory = await Category.findOne({ categoryId });
   console.log({ existingCategory, categoryId });
   if (!existingCategory) {
     return next(new OperationalError("Category not found", 400));
