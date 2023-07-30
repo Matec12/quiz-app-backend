@@ -135,6 +135,77 @@ class Helper {
     }
   };
 
+  // validateTopicPayload = async (payload, Category, Question, Topic) => {
+  //   const { title, category, level0, level1, level2, level3, level4 } = payload;
+  //   const levelArrays = [level0, level1, level2, level3, level4];
+  //   const validationErrors = [];
+
+  //   if (!title) {
+  //     throw new OperationalError("Topic title is required", 400);
+  //   }
+
+  //   if (!category) {
+  //     throw new OperationalError("Category is required", 400);
+  //   } else {
+  //     // Check if the category exists in the database
+  //     const existingCategory = await Category.findById(category);
+  //     if (!existingCategory) {
+  //       throw new OperationalError("Category not found in the database", 400);
+  //     }
+  //   }
+
+  //   // Helper function to add new questions to the Question collection
+  //   const addNewQuestions = async (questions) => {
+  //     const newQuestionIds = [];
+  //     for (const questionObj of questions) {
+  //       const existingQuestion = await Question.findOne({
+  //         prompt: questionObj.prompt,
+  //       });
+
+  //       if (!existingQuestion) {
+  //         // Question with the prompt does not exist, so create a new question
+  //         const newQuestion = new Question({
+  //           prompt: questionObj.prompt,
+  //           options: questionObj.options,
+  //           correctAnswer: questionObj.correctAnswer,
+  //           level: questionObj.level,
+  //         });
+  //         await newQuestion.save();
+  //         newQuestionIds.push(newQuestion._id);
+  //       } else {
+  //         // Question with the prompt exists, so use its ID
+  //         newQuestionIds.push(existingQuestion._id);
+  //       }
+  //     }
+  //     console.log({ newQuestionIds });
+  //     return newQuestionIds;
+  //   };
+
+  //   // Validate and update the level arrays with new question IDs
+  //   await Promise.all(
+  //     levelArrays.map(async (questions, levelIndex) => {
+  //       if (!Array.isArray(questions)) {
+  //         throw new OperationalError(
+  //           `Level ${levelIndex} questions must be an array`,
+  //           400
+  //         );
+  //       } else {
+  //         const newQuestionIds = await addNewQuestions(questions);
+  //         payload[`level${levelIndex}`] = newQuestionIds;
+  //       }
+
+  //       // Validate level value
+  //       if (levelIndex !== 0 && (levelIndex < 0 || levelIndex > 4)) {
+  //         validationErrors.push(`Invalid level value: ${levelIndex}`);
+  //       }
+  //     })
+  //   );
+
+  //   if (validationErrors.length > 0) {
+  //     throw new OperationalError(validationErrors.join(". "), 400);
+  //   }
+  // };
+
   validateQuestionPayload = (payload, next) => {
     const { prompt, options, level, correctAnswer } = payload;
     const optionCount = Array.isArray(options) ? options.length : 0;
@@ -202,7 +273,7 @@ class Helper {
     let activateURL;
 
     if (req.originalUrl.includes("/api/v1/user/")) {
-      activateURL = `${process.env.REDIRECT_URL}/dashboard/verify-email?token=${oneTimeToken}`;
+      activateURL = `${process.env.REDIRECT_URL}/dashboard/verify-email/${oneTimeToken}`;
     }
     console.log(oneTimeToken);
 
