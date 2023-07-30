@@ -202,7 +202,7 @@ class Helper {
     let activateURL;
 
     if (req.originalUrl.includes("/api/v1/user/")) {
-      activateURL = `${process.env.REDIRECT_URL}/verify_email?token=${oneTimeToken}`;
+      activateURL = `${process.env.REDIRECT_URL}/dashboard/verify-email?token=${oneTimeToken}`;
     }
     console.log(oneTimeToken);
 
