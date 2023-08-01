@@ -175,7 +175,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Send token to the provided email
-  let resetURL = `${process.env.REDIRECT_URL}/reset_password/token=${oneTimeToken}`;
+  let resetURL = `${process.env.REDIRECT_URL}/reset-password/token=${oneTimeToken}`;
 
   const emailObj = {
     user,
