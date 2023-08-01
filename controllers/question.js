@@ -139,16 +139,20 @@ exports.getRandomQuestions = catchAsync(async (req, res, next) => {
   try {
     const { level } = req.params;
 
-    // Validate that the level is a valid number
-    if (isNaN(level)) {
-      return next(new OperationalError("Invalid level format", 400));
+    if (!level) {
+      return next(new OperationalError("level is required in path"), 400);
+    }
+
+    // if not categoryId is not from 0 to 4
+    if (level < 0 || level > 4) {
+      return next(new OperationalError("level must be from 0 to 4"), 400);
     }
 
     // Convert the level to a number
     const parsedLevel = parseInt(level, 10);
 
     // Query the database to retrieve 20 random questions with the specified level
-    const questions = await getRandomQuestionsByLevel(parsedLevel, 1);
+    const questions = await getRandomQuestionsByLevel(parsedLevel, 20);
 
     if (!questions || questions.length === 0) {
       return next(
@@ -159,6 +163,7 @@ exports.getRandomQuestions = catchAsync(async (req, res, next) => {
     // Return the list of random questions
     res.status(200).json({
       status: "success",
+      message: "Questions fetched successfully",
       data: { result: questions.length, questions: questions },
     });
   } catch (err) {
@@ -197,12 +202,14 @@ exports.getRapidFireQuestions = catchAsync(async (req, res, next) => {
       // Return the response
       res.status(200).json({
         status: "success",
+        message: "Questions fetched successfully",
         data: { questions: questions },
       });
     } else {
       // Return an empty array since questions were already fetched for the current day
       res.status(200).json({
         status: "success",
+        message: "Questions fetched successfully",
         data: { questions: [] },
       });
     }
