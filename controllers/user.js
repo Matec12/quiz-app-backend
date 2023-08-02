@@ -374,6 +374,7 @@ exports.updateStats = catchAsync(async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "User stats updated successfully",
+      data: { user },
     });
   } catch (err) {
     console.error("Error updating rapid fire completion:", err);
