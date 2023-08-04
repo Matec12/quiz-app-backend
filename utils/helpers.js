@@ -192,6 +192,30 @@ class Helper {
     return this.selectRandom(array, array.length);
   }
 
+  random({ topics, number, level }) {
+    let questions = [];
+
+    let MAX_ITERATION_COUNT = 3000;
+    while (questions.length < number && MAX_ITERATION_COUNT--) {
+      for (const topic of topics) {
+        const randomQuestions = this.selectRandom(topic[`level${level}`], 2);
+        for (let randomQuestion of randomQuestions) {
+          if (questions.length === number) return this.shuffle(questions);
+          while (
+            questions.includes(randomQuestion) &&
+            topic[`level${level}`].find(
+              (question) => !questions.includes(question)
+            )
+          ) {
+            randomQuestion = this.selectRandom(topic[`level${level}`], 1)[0];
+          }
+          questions.push(randomQuestion);
+        }
+      }
+    }
+    return this.shuffle(questions);
+  }
+
   async sendVerificationEmail(req, user) {
     const oneTimeToken = user.generateOneTimeToken(
       process.env.ONE_TIME_TOKEN_VALIDITY
