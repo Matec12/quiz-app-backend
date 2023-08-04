@@ -106,14 +106,23 @@ exports.getCategoryByIdAndLevel = catchAsync(async (req, res, next) => {
       );
     }
 
-    if (isNaN(level)) {
-      return next(new OperationalError("Invalid level format", 400));
+    // if not categoryId is not from 1 to 6
+    if (categoryId < 1 || categoryId > 6) {
+      return next(new OperationalError("categoryId must be from 1 to 6"), 400);
     }
 
-    // Convert the level to a number
+    // if not categoryId is not from 0 to 4
+    if (level < 0 || level > 4) {
+      return next(new OperationalError("level must be from 0 to 4"), 400);
+    }
+
+    // Convert the level and categoryId to a number
+    const parsedCategoryId = parseInt(categoryId, 10);
     const parsedLevel = parseInt(level, 10);
 
-    const category = await Category.findOne({ categoryId }).populate({
+    const category = await Category.findOne({
+      categoryId: parsedCategoryId,
+    }).populate({
       path: "topics",
       populate: {
         path: `level${parsedLevel}`,
@@ -138,7 +147,7 @@ exports.getCategoryByIdAndLevel = catchAsync(async (req, res, next) => {
 
     return res.status(200).json({
       status: "success",
-      message: "Question fetched succefully",
+      message: "Quiz fetched succefully",
       data: {
         quiz: {
           category: category.name,

@@ -30,6 +30,10 @@ const questionSchema = new Schema(
       min: 0,
       max: 3, // Assuming that the correct answer index will be between 0 and 3
     },
+    topic: {
+      type: Schema.ObjectId,
+      ref: "Topic",
+    },
   },
   { timestamps: true }
 );

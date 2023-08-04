@@ -1,4 +1,5 @@
 const Question = require("../models/question");
+const Topic = require("../models/topic");
 const User = require("../models/user");
 const catchAsync = require("../utils/catchAsync");
 const helpers = require("../utils/helpers");
@@ -14,33 +15,98 @@ const getRandomQuestionsByLevel = async (level, count) => {
 
 // Create a new question
 exports.createQuestion = catchAsync(async (req, res, next) => {
-  helpers.validateQuestionPayload(req.body, next);
+  const questionData = req.body;
 
-  const { prompt, options, level, correctAnswer } = req.body;
+  if (!Array.isArray(questionData)) {
+    // If the data is not an array, create a single question
+    helpers.validateQuestionPayload(questionData);
 
-  // Create the new question
-  const question = await Question.create({
-    prompt,
-    options,
-    level,
-    correctAnswer,
-  });
+    const { prompt, options, level, correctAnswer, topic } = questionData;
 
-  await question.save();
+    // Check if the topic ID exists in the database
+    const existingTopic = await Topic.findById(topic);
 
-  if (!question) {
-    return next(new OperationalError("something went wrong", 500));
+    if (!existingTopic) {
+      return next(new OperationalError("Topic not found in the database", 404));
+    }
+
+    // Check if a question with the same prompt already exists
+    const existingQuestion = await Question.findOne({ prompt });
+
+    if (existingQuestion) {
+      return next(
+        new OperationalError("A question with this prompt already exists", 400)
+      );
+    }
+
+    // Create the new question
+    const question = await Question.create({
+      prompt,
+      options,
+      level,
+      correctAnswer,
+      topic,
+    });
+
+    if (!question) {
+      return next(new OperationalError("Something went wrong", 500));
+    }
+
+    return res
+      .status(200)
+      .json({ status: "success", message: "Question created successfully" });
+  } else {
+    // If the data is an array, create multiple questions
+    try {
+      for (const questionPayload of questionData) {
+        helpers.validateQuestionPayload(questionPayload);
+
+        const { prompt, options, level, correctAnswer, topic } =
+          questionPayload;
+
+        // Check if the topic ID exists in the database
+        const existingTopic = await Topic.findById(topic);
+
+        if (!existingTopic) {
+          return next(
+            new OperationalError("Topic not found in the database", 404)
+          );
+        }
+
+        // Check if a question with the same prompt already exists
+        const existingQuestion = await Question.findOne({ prompt });
+
+        if (existingQuestion) {
+          continue; // Skip creating this question and move to the next one
+        }
+
+        // Create the new question
+        const question = await Question.create({
+          prompt,
+          options,
+          level,
+          correctAnswer,
+          topic,
+        });
+
+        if (!question) {
+          return next(new OperationalError("Something went wrong", 500));
+        }
+      }
+
+      return res
+        .status(200)
+        .json({ status: "success", message: "Questions created successfully" });
+    } catch (error) {
+      return next(error);
+    }
   }
-
-  res
-    .status(200)
-    .json({ status: "success", message: "Question created successfully" });
 });
 
 // Get all questions
 exports.getQuestion = catchAsync(async (req, res, next) => {
   try {
-    const { questionId, level } = req.query;
+    const { questionId, level, topic } = req.query;
     if (questionId) {
       // Find the question by its _id
       const question = await Question.findById(questionId);
@@ -58,6 +124,10 @@ exports.getQuestion = catchAsync(async (req, res, next) => {
       if (level) {
         // Filter questions by level if the level is provided in the query parameters
         query.level = level;
+      }
+
+      if (topic) {
+        query.topic = topic;
       }
 
       const questions = await Question.find(query);
