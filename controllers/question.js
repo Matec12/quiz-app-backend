@@ -53,6 +53,10 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
       return next(new OperationalError("Something went wrong", 500));
     }
 
+    // Update the respective level array in the Topic model
+    existingTopic[`level${level}`].push(question._id);
+    await existingTopic.save();
+
     return res
       .status(200)
       .json({ status: "success", message: "Question created successfully" });
@@ -93,6 +97,10 @@ exports.createQuestion = catchAsync(async (req, res, next) => {
         if (!question) {
           return next(new OperationalError("Something went wrong", 500));
         }
+
+        // Update the respective level array in the Topic model
+        existingTopic[`level${level}`].push(question._id);
+        await existingTopic.save();
       }
 
       return res
