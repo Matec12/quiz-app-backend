@@ -96,15 +96,7 @@ exports.getCategory = catchAsync(async (req, res, next) => {
 
 exports.getCategoryByIdAndLevel = catchAsync(async (req, res, next) => {
   try {
-    // if not categoryId or level, return error
     const { categoryId, level } = req.params;
-
-    if (!categoryId || !level) {
-      return next(
-        new OperationalError("categoryId / level is required in path"),
-        400
-      );
-    }
 
     // if not categoryId is not from 1 to 6
     if (categoryId < 1 || categoryId > 6) {
@@ -120,34 +112,39 @@ exports.getCategoryByIdAndLevel = catchAsync(async (req, res, next) => {
     const parsedCategoryId = parseInt(categoryId, 10);
     const parsedLevel = parseInt(level, 10);
 
-    const category = await Category.findOne({
-      categoryId: parsedCategoryId,
-    }).populate({
-      path: "topics",
-      populate: {
-        path: `level${parsedLevel}`,
-      },
-    });
-
+    // Find the category based on the categoryId
+    const category = await Category.findOne({ categoryId: parsedCategoryId });
     if (!category) {
       return next(new OperationalError("Category not found", 404));
     }
 
-    const topics = category.topics;
+    // Find all questions with the specified categoryId and level
+    const questions = await Question.find({ level: parsedLevel })
+      .populate({
+        path: "topic",
+        match: { category: category._id },
+        options: { populate: `level${parsedLevel}`, select: "-_id -__v" },
+      })
+      .exec();
 
-    let questions = [];
-    for (const topic of topics) {
-      const topicLevel = topic[`level${parsedLevel}`];
-      for (const lev of topicLevel) {
-        questions.push(lev);
-      }
+    if (!questions || questions.length === 0) {
+      return next(
+        new OperationalError(
+          "No questions found for this category and level",
+          404
+        )
+      );
     }
 
-    const randomQuestions = helpers.shuffle(questions);
+    const randomQuestions = helpers
+      .shuffle(questions)
+      .slice(0, 20)
+      .map((question) => question.toJSON());
 
+    // Return the response with the formatted data
     return res.status(200).json({
       status: "success",
-      message: "Quiz fetched succefully",
+      message: "Quiz fetched successfully",
       data: {
         quiz: {
           category: category.name,
@@ -156,10 +153,76 @@ exports.getCategoryByIdAndLevel = catchAsync(async (req, res, next) => {
         },
       },
     });
-  } catch (err) {
-    console.error("Error deleting category:", err);
-    return next(new OperationalError("Something went wrong", 500));
+  } catch (error) {
+    console.error(error);
+    next(new OperationalError("Something went wrong", 500));
   }
+
+  // try {
+  //   // if not categoryId or level, return error
+  //   const { categoryId, level } = req.params;
+
+  //   if (!categoryId || !level) {
+  //     return next(
+  //       new OperationalError("categoryId / level is required in path"),
+  //       400
+  //     );
+  //   }
+
+  //   // if not categoryId is not from 1 to 6
+  //   if (categoryId < 1 || categoryId > 6) {
+  //     return next(new OperationalError("categoryId must be from 1 to 6"), 400);
+  //   }
+
+  //   // if not categoryId is not from 0 to 4
+  //   if (level < 0 || level > 4) {
+  //     return next(new OperationalError("level must be from 0 to 4"), 400);
+  //   }
+
+  //   // Convert the level and categoryId to a number
+  //   const parsedCategoryId = parseInt(categoryId, 10);
+  //   const parsedLevel = parseInt(level, 10);
+
+  //   const category = await Category.findOne({
+  //     categoryId: parsedCategoryId,
+  //   }).populate({
+  //     path: "topics",
+  //     populate: {
+  //       path: `level${parsedLevel}`,
+  //     },
+  //   });
+
+  //   if (!category) {
+  //     return next(new OperationalError("Category not found", 404));
+  //   }
+
+  //   const topics = category.topics;
+
+  //   let questions = [];
+  //   for (const topic of topics) {
+  //     const topicLevel = topic[`level${parsedLevel}`];
+  //     for (const lev of topicLevel) {
+  //       questions.push(lev);
+  //     }
+  //   }
+
+  //   const randomQuestions = helpers.shuffle(questions);
+
+  //   return res.status(200).json({
+  //     status: "success",
+  //     message: "Quiz fetched succefully",
+  //     data: {
+  //       quiz: {
+  //         category: category.name,
+  //         level: parsedLevel,
+  //         questions: randomQuestions,
+  //       },
+  //     },
+  //   });
+  // } catch (err) {
+  //   console.error("Error deleting category:", err);
+  //   return next(new OperationalError("Something went wrong", 500));
+  // }
 });
 
 exports.updateCategory = catchAsync(async (req, res, next) => {

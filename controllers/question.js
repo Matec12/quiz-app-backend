@@ -1,3 +1,4 @@
+const Category = require("../models/category");
 const Question = require("../models/question");
 const Topic = require("../models/topic");
 const User = require("../models/user");
@@ -241,6 +242,69 @@ exports.getRandomQuestions = catchAsync(async (req, res, next) => {
     next(new OperationalError("Something went wrong", 500));
   }
 });
+
+// Controller to get 20 random questions by categoryId and level
+// exports.getRandomQuestionsByCategoryAndLevel = catchAsync(
+//   async (req, res, next) => {
+//     try {
+//       const { categoryId, level } = req.params;
+
+//       // Find the category based on the categoryId
+//       const category = await Category.findOne({ categoryId });
+//       if (!category) {
+//         return next(new OperationalError("Category not found", 404));
+//       }
+
+//       // Find all topics that belong to the category
+//       const topics = await Topic.find({ category: category._id }).populate(
+//         `level${level}`
+//       );
+//       if (!topics || topics.length === 0) {
+//         return next(
+//           new OperationalError(
+//             "No topics found for this category and level",
+//             404
+//           )
+//         );
+//       }
+
+//       // Get all question ids from the topics
+//       const questionIds = topics.reduce((ids, topic) => {
+//         const levelArray = topic[`level${level}`];
+//         if (levelArray && levelArray.length > 0) {
+//           ids.push(...levelArray);
+//         }
+//         return ids;
+//       }, []);
+
+//       // Shuffle the questionIds array to get random questions
+//       const shuffledQuestionIds = questionIds.sort(() => Math.random() - 0.5);
+
+//       // Find the questions based on the randomQuestionIds
+//       const questions = await Question.find({
+//         _id: { $in: shuffledQuestionIds },
+//       });
+
+//       const randomQuestions = helpers.shuffle(questions).slice(0, 20);
+
+//       // Return the response with the formatted data
+//       return res.status(200).json({
+//         status: "success",
+//         message: "Quiz fetched successfully",
+//         data: {
+//           quiz: {
+//             category: category.name,
+//             level: Number(level),
+//             questions: randomQuestions,
+//           },
+//         },
+//       });
+//     } catch (error) {
+//       console.error(error);
+//       next(new OperationalError("Something went wrong", 500));
+//     }
+//   }
+// );
 
 // Controller to get rapidFireQuestions
 exports.getRapidFireQuestions = catchAsync(async (req, res, next) => {
