@@ -11,7 +11,8 @@ const getRandomQuestionsByLevel = async (level, count) => {
     { $match: { level } },
     { $sample: { size: count } },
   ]);
-  return questions;
+
+  return helpers.shuffle(questions);
 };
 
 // Create a new question
