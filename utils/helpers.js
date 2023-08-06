@@ -168,7 +168,7 @@ class Helper {
 
   validQuizAnsweredPayload = Joi.object({
     quizResult: Joi.number().integer().min(0).required(),
-    starsEarned: Joi.number().integer().min(0).required(),
+    starsEarned: Joi.number().integer().required(),
   });
 
   selectRandom(array, number) {
