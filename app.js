@@ -9,6 +9,7 @@ const adminRoute = require("./routes/admin");
 const categoryRoute = require("./routes/category");
 const topicRoute = require("./routes/topic");
 const questionRoute = require("./routes/question");
+const usersRoute = require("./routes/users");
 const OperationalError = require("./utils/operationalError");
 const globalErrorHandler = require("./middlewares/errorHandler/globalErrorHandler");
 
@@ -39,6 +40,7 @@ app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/category", categoryRoute);
 app.use("/api/v1/topic", topicRoute);
 app.use("/api/v1/question", questionRoute);
+app.use("/api/v1/users", usersRoute);
 
 // handle all Unregister routes
 app.all("*", (req, _, next) => {
