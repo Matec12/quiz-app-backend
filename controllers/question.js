@@ -16,100 +16,58 @@ const getRandomQuestionsByLevel = async (level, count) => {
 };
 
 // Create a new question
-exports.createQuestion = catchAsync(async (req, res, next) => {
-  const questionData = req.body;
+exports.createQuestions = catchAsync(async (req, res, next) => {
+  const questionDataArray = req.body;
 
-  if (!Array.isArray(questionData)) {
-    // If the data is not an array, create a single question
-    helpers.validateQuestionPayload(questionData);
+  if (!Array.isArray(questionDataArray)) {
+    return next(new OperationalError("Invalid request data", 400));
+  }
 
-    const { prompt, options, level, correctAnswer, topic } = questionData;
+  try {
+    const topicId = req.params.topicId; // Collect topic ID from params
 
     // Check if the topic ID exists in the database
-    const existingTopic = await Topic.findById(topic);
+    const existingTopic = await Topic.findById(topicId);
 
     if (!existingTopic) {
       return next(new OperationalError("Topic not found in the database", 404));
     }
 
-    // Check if a question with the same prompt already exists
-    const existingQuestion = await Question.findOne({ prompt });
+    for (const questionData of questionDataArray) {
+      helpers.validateQuestionPayload(questionData);
 
-    if (existingQuestion) {
-      return next(
-        new OperationalError("A question with this prompt already exists", 400)
-      );
+      const { prompt, options, level, correctAnswer } = questionData;
+
+      // Check if a question with the same prompt already exists
+      const existingQuestion = await Question.findOne({ prompt });
+
+      if (existingQuestion) {
+        continue; // Skip creating this question and move to the next one
+      }
+
+      // Create the new question
+      const question = await Question.create({
+        prompt,
+        options,
+        level,
+        correctAnswer,
+        topic: topicId,
+      });
+
+      if (!question) {
+        return next(new OperationalError("Something went wrong", 500));
+      }
+
+      // Update the respective level array in the Topic model
+      existingTopic[`level${level}`].push(question._id);
+      await existingTopic.save();
     }
-
-    // Create the new question
-    const question = await Question.create({
-      prompt,
-      options,
-      level,
-      correctAnswer,
-      topic,
-    });
-
-    if (!question) {
-      return next(new OperationalError("Something went wrong", 500));
-    }
-
-    // Update the respective level array in the Topic model
-    existingTopic[`level${level}`].push(question._id);
-    await existingTopic.save();
 
     return res
       .status(200)
-      .json({ status: "success", message: "Question created successfully" });
-  } else {
-    // If the data is an array, create multiple questions
-    try {
-      for (const questionPayload of questionData) {
-        helpers.validateQuestionPayload(questionPayload);
-
-        const { prompt, options, level, correctAnswer, topic } =
-          questionPayload;
-
-        // Check if the topic ID exists in the database
-        const existingTopic = await Topic.findById(topic);
-
-        if (!existingTopic) {
-          return next(
-            new OperationalError("Topic not found in the database", 404)
-          );
-        }
-
-        // Check if a question with the same prompt already exists
-        const existingQuestion = await Question.findOne({ prompt });
-
-        if (existingQuestion) {
-          continue; // Skip creating this question and move to the next one
-        }
-
-        // Create the new question
-        const question = await Question.create({
-          prompt,
-          options,
-          level,
-          correctAnswer,
-          topic,
-        });
-
-        if (!question) {
-          return next(new OperationalError("Something went wrong", 500));
-        }
-
-        // Update the respective level array in the Topic model
-        existingTopic[`level${level}`].push(question._id);
-        await existingTopic.save();
-      }
-
-      return res
-        .status(200)
-        .json({ status: "success", message: "Questions created successfully" });
-    } catch (error) {
-      return next(error);
-    }
+      .json({ status: "success", message: "Questions created successfully" });
+  } catch (error) {
+    return next(error);
   }
 });
 

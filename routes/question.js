@@ -5,7 +5,12 @@ const { restrict } = require("../middlewares/authorize");
 
 const router = express.Router();
 
-router.post("/create", secureRoute, restrict("user"), question.createQuestion);
+router.post(
+  "/create/:topicId",
+  secureRoute,
+  restrict("user"),
+  question.createQuestions
+);
 router.get("/get", secureRoute, question.getQuestion);
 router.get("/random/:level", secureRoute, question.getRandomQuestions);
 router.get("/rpdfire", secureRoute, question.getRapidFireQuestions);
